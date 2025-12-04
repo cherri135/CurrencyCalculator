@@ -1,0 +1,11 @@
+import requests
+import math
+
+JsonUrl = "https://data.norges-bank.no/api/data/EXR/B..NOK.SP?startPeriod=2025-11-27&endPeriod=2025-12-04&format=sdmx-json&locale=no"
+
+try:
+    RawData = requests.get(JsonUrl)
+    Data = RawData.json()
+    print(Data)
+except:
+    print("didnt work")
