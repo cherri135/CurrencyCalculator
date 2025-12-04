@@ -1,11 +1,112 @@
 import requests
 import math
 
-JsonUrl = "https://data.norges-bank.no/api/data/EXR/B..NOK.SP?startPeriod=2025-11-27&endPeriod=2025-12-04&format=sdmx-json&locale=no"
+def TurnExchangeRateIntoInt(Currency):
+
+    clean = ""
+
+    for char in Currency:
+        if char != "]" and char != "[" and char != "'":
+            clean += char
+    
+    return clean
+
+def CheckIfValidCurrency(Currency):
+    for Cur in CurrencyToFind:
+        if str(Cur) == str(Currency):
+            return True
+    
+    return False
+
+CurrencyToFind = {
+
+    "HUF" : [0, 5],
+    "DKK" : [1, 5],
+    "MMK" : [2, 5],
+    "XDR" : [3, 5],
+    "TRY" : [4, 5],
+    "RON" : [5, 5],
+    "NZD" : [6, 5],
+    "JPY" : [7, 5],
+    "HKD" : [8, 5],
+    "CZK" : [9, 5],
+    "CAD" : [10, 5],
+    "BDT" : [11, 5],
+    "USD" : [12, 5],
+    "THB" : [13, 5],
+    "PLN" : [14, 5],
+    "AUD" : [15, 5],
+    "MYR" : [16, 5],
+    "INR" : [17, 5],
+    "IDR" : [18, 5],
+    "GBP" : [19, 5],
+    "CNY" : [20, 5],
+    "BRL" : [21, 5],
+    "VND" : [22, 5],
+    "BYN" : [23, 5],
+    "TWI" : [24, 5],
+    "SGD" : [25, 5],
+    "PKR" : [26, 5],
+    "MXN" : [27, 5],
+    "ILS" : [28, 5],
+    "I44" : [29, 5],
+    "EUR" : [30, 5],
+    "CHF" : [31, 5],
+    "BGN" : [32, 5],
+    "ISK" : [33, 5],
+    "ZAR" : [34, 5],
+    "TWD" : [35, 5],
+    "SEK" : [36, 5],
+    "PHP" : [37, 5],
+    "KRW" : [38, 5]
+
+}
+
+print(
+    "HUF Ungarske forinter    DKK Danske kroner\n"
+    "MMK Myanmar kyat         XDR IMF Spesielle trekkrettigheter\n"
+    "TRY Tyrkiske lira        RON Ny rumenske leu\n"
+    "NZD New Zealand dollar   JPY Japanske yen\n"
+    "HKD Hong Kong dollar     CZK Tsjekkiske koruna\n"
+    "CAD Kanadiske dollar     BDT Bangladeshi taka\n"
+    "USD Amerikanske dollar   THB Thailandske baht\n"
+    "PLN Polske zloty         AUD Australske dollar\n"
+    "MYR Malaysiske ringgit   INR Indiske rupi\n"
+    "IDR Indonesiske rupiah   GBP Britiske pund\n"
+    "CNY Kinesiske yuan       BRL Brasilianske real\n"
+    "VND Vietnamesiske dong   BYN Belarusiske nye rubler\n"
+    "TWI IndustriensEV        SGD Singapore dollar\n"
+    "PKR Pakistanske rupi     MXN Meksikanske peso\n"
+    "ILS Ny israelsk shekel   I44 Importveid kursindeks\n"
+    "EUR Euro                 CHF Sveitsiske franc\n"
+    "BGN Bulgarske lev        ISK Islandske kroner\n"
+    "ZAR Sørafrikanske rand   TWD Nye taiwanske dollar\n"
+    "SEK Svenske kroner       PHP Filippinske peso\n"
+    "KRW Sørkoreanske won"
+)
+
+print("\nskriv 3-bokstav navnet til valutaen som du vil kjøpe")
+
+CurrencyChosen = input().upper()
+
+if CheckIfValidCurrency(CurrencyChosen) == False:
+    print("please choose a valid currency")
+    exit()
+
+print("\nskriv hvor mye", str(CurrencyChosen), "Du vil ha")
+
+HowMuchToBuy = input()
 
 try:
-    RawData = requests.get(JsonUrl)
+    RawData = requests.get("https://data.norges-bank.no/api/data/EXR/B..NOK.SP?startPeriod=2025-11-27&endPeriod=2025-12-04&format=sdmx-json&locale=no")
     Data = RawData.json()
-    print(Data)
 except:
-    print("didnt work")
+    print("could not import API")
+
+CurrencyValues = Data["data"]["dataSets"][0]["series"]
+
+ExchangeRate = (TurnExchangeRateIntoInt(CurrencyValues["0:" + str(CurrencyToFind[str(CurrencyChosen)][0]) + ":0:0"]["observations"]["5"]))
+
+Cost = math.ceil(float(ExchangeRate) * float(HowMuchToBuy) * 100) / 100
+
+print("Det koster", str(Cost), "Kroner å kjøpe", HowMuchToBuy, str(CurrencyChosen))
