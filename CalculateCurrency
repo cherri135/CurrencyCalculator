@@ -85,28 +85,43 @@ print(
     "KRW Sørkoreanske won"
 )
 
-print("\nskriv 3-bokstav navnet til valutaen som du vil kjøpe")
+def CurrencyCalculator():
 
-CurrencyChosen = input().upper()
+    print("\nskriv 3-bokstav navnet til valutaen som du vil kjøpe")
 
-if CheckIfValidCurrency(CurrencyChosen) == False:
-    print("please choose a valid currency")
-    exit()
+    CurrencyChosen = input().upper()
 
-print("\nskriv hvor mye", str(CurrencyChosen), "Du vil ha")
+    if CheckIfValidCurrency(CurrencyChosen) == False:
+        print("velg en tiljengelig valuta")
+        
 
-HowMuchToBuy = input()
+    print("\nskriv hvor mye", str(CurrencyChosen), "Du vil kjøpe")
 
-try:
-    RawData = requests.get("https://data.norges-bank.no/api/data/EXR/B..NOK.SP?startPeriod=2025-11-27&endPeriod=2025-12-04&format=sdmx-json&locale=no")
-    Data = RawData.json()
-except:
-    print("could not import API")
+    HowMuchToBuy = input()
 
-CurrencyValues = Data["data"]["dataSets"][0]["series"]
+    try:
+        float(HowMuchToBuy)
+    except ValueError:
+        print("Skriv et nummer")
 
-ExchangeRate = (TurnExchangeRateIntoInt(CurrencyValues["0:" + str(CurrencyToFind[str(CurrencyChosen)][0]) + ":0:0"]["observations"]["5"]))
+    try:
 
-Cost = math.ceil(float(ExchangeRate) * float(HowMuchToBuy) * 100) / 100
+        RawData = requests.get("https://data.norges-bank.no/api/data/EXR/B..NOK.SP?startPeriod=2025-11-27&endPeriod=2025-12-04&format=sdmx-json&locale=no")
+        Data = RawData.json()
 
-print("Det koster", str(Cost), "Kroner å kjøpe", HowMuchToBuy, str(CurrencyChosen))
+    except:
+        
+        print("Error: kunne ikke importere, gåt ut av applikasjonen")
+        exit()
+
+    CurrencyValues = Data["data"]["dataSets"][0]["series"]
+
+    ExchangeRate = (TurnExchangeRateIntoInt(CurrencyValues["0:" + str(CurrencyToFind[str(CurrencyChosen)][0]) + ":0:0"]["observations"]["5"]))
+
+    Cost = math.ceil(float(ExchangeRate) * float(HowMuchToBuy) * 100) / 100
+
+    print("\nDet koster", str(Cost), "Kroner å kjøpe", HowMuchToBuy, str(CurrencyChosen))
+
+    CurrencyCalculator()
+
+CurrencyCalculator()
